@@ -5,7 +5,8 @@ from threading import Timer
 import sys
 import os
 from datetime import date, timedelta
-
+import socket
+import qrcode
 
 if getattr(sys, 'frozen', False):
     # Está rodando no exe criado pelo PyInstaller/auto-py-to-exe
@@ -321,6 +322,27 @@ def aniversariantes():
 def abrir_navegador():
     webbrowser.open_new('http://127.0.0.1:5000/')
 
+def get_ip_local():
+    try:
+        s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip_local = s.getsockname()[0]
+        s.close()
+        return ip_local
+    except:
+        return '127.0.0.1'
+
+def gerar_qrcode_e_mostrar(url):
+    img = qrcode.make(url)
+    img.save("qrcode_flask.png")
+    print("QR Code gerado e salvo como qrcode_flask.png")
+    img.show()
+
 if __name__ == "__main__":
     Timer(1, abrir_navegador).start()
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    ip = get_ip_local()
+    url = f"http://{ip}:5000"
+    print(f"Acesse pelo navegador: {url}")
+    gerar_qrcode_e_mostrar(url)
+    app.run(host="0.0.0.0", port=5000)
+
