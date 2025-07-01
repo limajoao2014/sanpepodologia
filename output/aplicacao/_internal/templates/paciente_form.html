@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<h2>Novo Paciente</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label>Nome</label>
+        <input type="text" name="nome" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Telefone</label>
+        <input type="text" name="telefone" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Data de Nascimento</label>
+        <input type="date" name="data_nascimento" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Endereço</label>
+        <input type="text" name="endereco" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Bairro</label>
+        <input type="text" name="bairro" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Cidade</label>
+        <input type="text" name="cidade" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="estado" class="form-label">UF</label>
+        <select name="estado" id="estado" class="form-control" required>
+            <option value="" selected disabled>Selecione</option>
+            <option value="AC">Acre (AC)</option>
+            <option value="AL">Alagoas (AL)</option>
+            <option value="AP">Amapá (AP)</option>
+            <option value="AM">Amazonas (AM)</option>
+            <option value="BA">Bahia (BA)</option>
+            <option value="CE">Ceará (CE)</option>
+            <option value="DF">Distrito Federal (DF)</option>
+            <option value="ES">Espírito Santo (ES)</option>
+            <option value="GO">Goiás (GO)</option>
+            <option value="MA">Maranhão (MA)</option>
+            <option value="MT">Mato Grosso (MT)</option>
+            <option value="MS">Mato Grosso do Sul (MS)</option>
+            <option value="MG">Minas Gerais (MG)</option>
+            <option value="PA">Pará (PA)</option>
+            <option value="PB">Paraíba (PB)</option>
+            <option value="PR">Paraná (PR)</option>
+            <option value="PE">Pernambuco (PE)</option>
+            <option value="PI">Piauí (PI)</option>
+            <option value="RJ">Rio de Janeiro (RJ)</option>
+            <option value="RN">Rio Grande do Norte (RN)</option>
+            <option value="RS">Rio Grande do Sul (RS)</option>
+            <option value="RO">Rondônia (RO)</option>
+            <option value="RR">Roraima (RR)</option>
+            <option value="SC">Santa Catarina (SC)</option>
+            <option value="SP">São Paulo (SP)</option>
+            <option value="SE">Sergipe (SE)</option>
+            <option value="TO">Tocantins (TO)</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>CEP</label>
+        <input type="text" name="cep" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="sexo" class="form-label">Sexo</label>
+        <select name="sexo" id="sexo" class="form-control" required>
+            <option value="" selected disabled>Selecione</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Outro">Outro</option>
+            <option value="Prefere não informar">Prefere não informar</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="estado_civil" class="form-label">Estado Civil</label>
+        <select name="estado_civil" id="estado_civil" class="form-control" required>
+            <option value="" selected disabled>Selecione</option>
+            <option value="Solteiro(a)">Solteiro(a)</option>
+            <option value="Casado(a)">Casado(a)</option>
+            <option value="Divorciado(a)">Divorciado(a)</option>
+            <option value="Viúvo(a)">Viúvo(a)</option>
+            <option value="Separado(a)">Separado(a)</option>
+            <option value="União estável">União estável</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="cidade_naturalidade" class="form-label">Cidade de Naturalidade</label>
+        <input type="text" name="cidade_naturalidade" id="cidade_naturalidade" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Profissão</label>
+        <input type="text" name="profissao" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="altura" class="form-label">Altura (m)</label>
+        <input type="number" name="altura" id="altura" class="form-control" step="0.01" min="0.5" max="2.5"
+            placeholder="Ex: 1.75" required>
+    </div>
+    <div class="mb-3">
+        <label for="peso" class="form-label">Peso (kg)</label>
+        <input type="number" name="peso" id="peso" class="form-control" step="0.1" min="20" max="300"
+            placeholder="Ex: 70.5" required>
+    </div>
+    <div class="mb-3">
+        <label>Indicado Por:</label>
+        <input type="text" name="indicacao" class="form-control">
+    </div>
+    <h4>Ficha de Anamnese</h4>
+    <div class="mb-3">
+        <label>Patologias Ungueais:</label><br>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="onicomicose" value="1">
+            <label class="form-check-label">Onicomicose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="onicocriptose" value="1">
+            <label class="form-check-label">Onicocriptose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="onicogrifose" value="1">
+            <label class="form-check-label">Onicogrifose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="onicotrofia" value="1">
+            <label class="form-check-label">Onicotrofia</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="verruga_plantar" value="1">
+            <label class="form-check-label">Hiperidrose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="Anidrose" value="1">
+            <label class="form-check-label">Anidrose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="Bromidrose" value="1">
+            <label class="form-check-label">Bromidrose</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="Cromidose" value="1">
+            <label class="form-check-label">Cromidose</label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Hálux:</label><br>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="halux" value="valgo">
+            <label class="form-check-label">Valgo</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="halux" value="varo">
+            <label class="form-check-label">Varo</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="halux" value="normal" checked>
+            <label class="form-check-label">Normal</label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label>Tipo de Pé:</label><br>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="tipo_pe" value="plano">
+            <label class="form-check-label">Plano</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="tipo_pe" value="cavo">
+            <label class="form-check-label">Cavo</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="tipo_pe" value="normal" checked>
+            <label class="form-check-label">Normal</label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label>Tipo de unha?</label><br>
+        <input type="checkbox" class="form-check-input" id="diabetes" name="tipo_unha" value="diabete">
+        <label class="form-check-label" for="diabetes">Diabete</label>
+    </div>
+    <div class="mb-3">
+        <label>Observações da Anamnese:</label>
+        <textarea name="anamnese" class="form-control" rows="3"></textarea>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{{ url_for('listar_pacientes') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

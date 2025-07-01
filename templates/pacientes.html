@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<h2>Pacientes</h2>
+
+<a href="{{ url_for('novo_paciente') }}" class="btn btn-success mb-3">
+    <i class="bi bi-person-plus"></i> Novo Paciente
+</a>
+<div class="table-container">
+    <table class="table table-bordered tabela-pacientes">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data Nasc.</th>
+                <th>Telefone</th>
+                <th>Email</th>
+                <th>Endereço</th>
+                <th>Bairro</th>
+                <th>Cidade</th>
+                <th>Estado</th>
+                <th>CEP</th>
+                <th>Naturalidade</th>
+                <th>Sexo</th>
+                <th>Estado Civil</th>
+                <th>Profissão</th>
+                <th>Altura</th>
+                <th>Peso</th>
+                <th>Indicado Por</th>
+                <th>Onicomicose</th>
+                <th>Onicocriptose</th>
+                <th>Onicogrifose</th>
+                <th>Onicoatrofia</th>
+                <th>Verruga Plantar</th>
+                <th>Hiperidrose</th>
+                <th>Anidrose</th>
+                <th>Bromidrose</th>
+                <th>Cromidrose</th>
+                <th>Hálux</th>
+                <th>Tipo de Pé</th>
+                <th>Tipo de Unha</th>
+                <th>Anamnese</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pacientes %}
+            <tr>
+                <td>{{ p[0] }}</td> <!-- ID -->
+                <td>{{ p[1] }}</td> <!-- Nome -->
+                <td>{{ p[2] }}</td> <!-- Data Nascimento -->
+                <td>{{ p[3] }}</td> <!-- Telefone -->
+                <td>{{ p[4] }}</td> <!-- Email -->
+                <td>{{ p[5] }}</td> <!-- Endereço -->
+                <td>{{ p[6] }}</td> <!-- Bairro -->
+                <td>{{ p[7] }}</td> <!-- Cidade -->
+                <td>{{ p[8] }}</td> <!-- Estado -->
+                <td>{{ p[9] }}</td> <!-- CEP -->
+                <td>{{ p[10] }}</td> <!-- Naturalidade -->
+                <td>{{ p[11] }}</td> <!-- Sexo -->
+                <td>{{ p[12] }}</td> <!-- Estado Civil -->
+                <td>{{ p[13] }}</td> <!-- Profissão -->
+                <td>{{ p[14] }}</td> <!-- Altura -->
+                <td>{{ p[15] }}</td> <!-- Peso -->
+                <td>{{ p[16] }}</td> <!-- Indicado Por -->
+                <td>{{ p[17] }}</td> <!-- Onicomicose -->
+                <td>{{ p[18] }}</td> <!-- Onicocriptose -->
+                <td>{{ p[19] }}</td> <!-- Onicogrifose -->
+                <td>{{ p[20] }}</td> <!-- Onicoatrofia -->
+                <td>{{ p[21] }}</td> <!-- Verruga Plantar -->
+                <td>{{ p[22] }}</td> <!-- Hiperidrose -->
+                <td>{{ p[23] }}</td> <!-- Anidrose -->
+                <td>{{ p[24] }}</td> <!-- Bromidrose -->
+                <td>{{ p[25] }}</td> <!-- Cromidrose -->
+                <td>{{ p[26] }}</td> <!-- Hálux -->
+                <td>{{ p[27] }}</td> <!-- Tipo de Pé -->
+                <td>{{ p[28] }}</td> <!-- Tipo de Unha -->
+                <td>{{ p[29] }}</td> <!-- Anamnese -->
+                <td>
+                    <a href="/paciente/deletar/{{ p[0] }}" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

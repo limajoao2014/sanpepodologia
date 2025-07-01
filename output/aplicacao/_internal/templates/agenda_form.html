@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h2>Nova Agenda</h2>
+
+<form action="{{ url_for('novo_agenda') }}" method="POST">
+    <div class="mb-3">
+        <label for="paciente_id" class="form-label">Paciente</label>
+        <select class="form-select" id="paciente_id" name="paciente_id" required>
+            <option value="" selected disabled hidden>Selecione um paciente</option>
+            {% for paciente in pacientes %}
+            <option value="{{ paciente[0] }}">{{ paciente[0] }} - {{ paciente[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="data" class="form-label">Data</label>
+        <input type="date" class="form-control" id="data" name="data" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="horario" class="form-label">Horário</label>
+        <input type="time" class="form-control" id="horario" name="horario" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="observacoes" class="form-label">Observações</label>
+        <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Salvar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podologia - Sistema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">Podologia</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pacientes">Pacientes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/agenda">Agenda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/aniversariantes">Aniversariantes</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block conteudo %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<style>
+    /* 🎨 Fundo geral */
+    body {
+        background-color: #F8F1E9;
+        color: #000;
+        font-size: 18px;
+    }
+
+    /* 🔵 Navbar */
+    .navbar {
+        background-color: #A0522D;
+        /* Marrom suave */
+    }
+
+    .navbar a {
+        color: white !important;
+    }
+
+    /* ✅ Estilo da Tabela */
+    .table-container {
+        overflow-x: auto;
+        width: 105%;
+    }
+
+    .tabela-pacientes {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+    }
+
+    .tabela-pacientes th {
+        background-color: #A8C686;
+        color: #000;
+        text-align: center;
+        padding: 8px;
+        font-size: 17px;
+        border: 1px solid #ccc;
+    }
+
+    .tabela-pacientes td {
+        background-color: white;
+        color: #000;
+        text-align: center;
+        padding: 8px;
+        vertical-align: middle;
+        font-size: 17px;
+        border: 1px solid #ccc;
+    }
+
+    .tabela-pacientes tr:nth-child(even) {
+        background-color: white;
+    }
+
+    .tabela-pacientes tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    .tabela-pacientes tr:hover {
+        background-color: #f2f2f2;
+    }
+
+    /* 🔲 Bordas */
+    .tabela-pacientes th,
+    .tabela-pacientes td {
+        border: 1px solid #CCCCCC;
+    }
+
+    /* 🟩 Botões */
+    .btn-success {
+        background-color: #A8C686;
+        border: none;
+        color: #1F1F1F;
+    }
+
+    .btn-success:hover {
+        background-color: #8FA96D;
+    }
+
+    .btn-danger {
+        background-color: #E57373;
+        border: none;
+        color: #FFFFFF;
+    }
+
+    .btn-danger:hover {
+        background-color: #D45C5C;
+    }
+
+    /* 🎯 Centralizar Títulos */
+    h2 {
+        color: #A0522D;
+    }
+
+    /* 📌 Filtros */
+    select,
+    input[type="date"],
+    input[type="text"] {
+        background-color: white;
+        color: #000;
+        border: 1px solid #ccc;
+        padding: 6px;
+        border-radius: 4px;
+    }
+
+    /* 🔠 Evita quebra de linha */
+    .tabela-pacientes td,
+    .tabela-pacientes th {
+        white-space: nowrap;
+    }
+</style>
+
+</html>

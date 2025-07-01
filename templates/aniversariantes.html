@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<h2>Aniversariantes Próximos</h2>
+
+{% if pacientes %}
+<div class="table-container">
+    <table class="table table-bordered tabela-pacientes">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pacientes %}
+            <tr>
+                <td>{{ p[0] }}</td>
+                <td>{{ p[1] }}</td>
+                <td>{{ p[2] }}</td>
+                <td>{{ p[3] }}</td>
+                <td>
+                    <a href="https://wa.me/55{{ p[3]|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}?text={{ ('Olá ' + p[1] + ', nós da Sanpépodologia desejamos um feliz aniversário! Que seu dia seja cheio de alegrias, saúde e coisas boas!') | urlencode }}"
+                        target="_blank" class="btn btn-success">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>Não há aniversariantes nos próximos dias.</p>
+{% endif %}
+
+{% endblock %}
