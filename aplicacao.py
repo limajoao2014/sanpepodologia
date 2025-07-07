@@ -12,7 +12,7 @@ if getattr(sys, 'frozen', False):
     # Está rodando no exe criado pelo PyInstaller/auto-py-to-exe
     BASE_DIR = sys._MEIPASS
 else:
-    # Está rodando no script python normal
+    # Está rodando no script python normal\
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATA_DIR = os.path.join(BASE_DIR, 'data')
@@ -102,7 +102,6 @@ FROM
     pacientes = cursor.fetchall()
     conn.close()
     return render_template('pacientes.html', pacientes=pacientes)
-
 # Adicionar paciente
 @app.route('/paciente/novo', methods=['GET', 'POST'])
 def novo_paciente():
