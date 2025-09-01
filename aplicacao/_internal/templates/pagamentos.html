@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<h2>Pagamentos</h2>
+<p>Aqui você pode listar e gerenciar os pagamentos.</p>
+<a href="{{ url_for('novo_pagamento') }}" class="btn btn-success mb-3">
+    <i class="bi bi-person-plus"></i> Nova pagamento
+</a>
+
+<!-- KPIs -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary p-3">
+            <h5>Total de Registros</h5>
+            <h3>{{ total_registros }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success p-3">
+            <h5>Soma Total</h5>
+            <h3>R$ {{ "{:,.2f}".format(soma_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-warning p-3">
+            <h5>Média de Valores</h5>
+            <h3>R$ {{ "{:,.2f}".format(media_valores).replace(",", "X").replace(".", ",").replace("X", ".") }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<form method="GET" class="d-flex mb-3 gap-2">
+    <input type="text" name="nome" value="{{ nome }}" class="form-control" placeholder="Filtrar por nome">
+    <input type="text" name="id" value="{{ id }}" class="form-control" placeholder="Filtrar por ID">
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <a href="{{ url_for('listar_pagamentos')}}" class="btn btn-secondary">Limpar</a>
+</form>
+
+<!-- Tabela -->
+<div class="table_pagamentos">
+    <table class="table table-bordered tabela-pacientes">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data Pagamento</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Excluir</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pagamentos %}
+            <tr>
+                <td>{{ p[0] }}</td>
+                <td>{{ p[1] }}</td>
+                <td>{{ p[2] }}</td>
+                <td>{{ p[3] }}</td>
+                <td>R$ {{ p[4] }}</td>
+                <td><a href="/pagamento/deletar/{{ p[0] }}" class="btn btn-sm btn-danger">Excluir</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginação -->
+    <nav>
+        <ul class="pagination">
+            {% if pagina > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="?pagina={{ pagina-1 }}&nome={{ nome }}&id={{ aluno_id }}">Anterior</a>
+            </li>
+            {% endif %}
+
+            {# Definindo o intervalo de páginas a mostrar #}
+            {% set max_links = 7 %}
+            {% set start_page = pagina - max_links // 2 %}
+            {% set end_page = pagina + max_links // 2 %}
+
+            {# Ajustar limites para não sair dos valores válidos #}
+            {% if start_page < 1 %} {% set end_page=end_page + (1 - start_page) %} {% set start_page=1 %} {% endif %} {%
+                if end_page> total_paginas %}
+                {% set start_page = start_page - (end_page - total_paginas) %}
+                {% if start_page < 1 %} {% set start_page=1 %} {% endif %} {% set end_page=total_paginas %} {% endif %}
+                    {# Mostrar o intervalo limitado #} {% for p in range(start_page, end_page + 1) %} <li
+                    class="page-item {% if p == pagina %}active{% endif %}">
+                    <a class="page-link" href="?pagina={{ p }}&nome={{ nome }}&id={{ aluno_id }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if pagina < total_paginas %} <li class="page-item">
+                        <a class="page-link" href="?pagina={{ pagina+1 }}&nome={{ nome }}&id={{ aluno_id }}">Próxima</a>
+                        </li>
+                        {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

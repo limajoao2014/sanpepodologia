@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h2>Nova Agenda</h2>
+
+<form action="{{ url_for('novo_pagamento') }}" method="POST">
+    <div class="mb-3">
+        <label for="paciente_id" class="form-label">Paciente</label>
+        <select class="form-select" id="paciente_id" name="paciente_id" required>
+            <option value="" selected disabled hidden>Selecione um paciente</option>
+            {% for paciente in pacientes %}
+            <option value="{{ paciente[0] }}">{{ paciente[0] }} - {{ paciente[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="data_pagamento" class="form-label">Data do Pagamento</label>
+        <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="conduta" class="form-label">Conduta</label>
+        <input type="text" class="form-control" id="conduta" name="conduta" maxlength="255"
+            placeholder="Descreva a conduta" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="valor" class="form-label">Valor (R$)</label>
+        <input type="number" class="form-control" id="valor" name="valor" step="0.01" min="0" placeholder="0,00"
+            required>
+    </div>
+
+    <div class="mb-3">
+        <label for="responsavel_pgto" class="form-label">Responsável pelo pagamento</label>
+        <input type="text" class="form-control" id="responsavel_pgto" name="responsavel_pgto" maxlength="255"
+            placeholder="Nome completo" required>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">💾 Salvar Pagamento</button>
+</form>
+{% endblock %}

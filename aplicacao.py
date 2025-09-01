@@ -7,6 +7,7 @@ import os
 from datetime import date, timedelta
 import socket
 import qrcode
+import math
 
 if getattr(sys, 'frozen', False):
     # Está rodando no exe criado pelo PyInstaller/auto-py-to-exe
@@ -30,78 +31,94 @@ def home():
 # Listar pacientes
 @app.route('/pacientes')
 def listar_pacientes():
-    conn = sqlite3.connect(db)
-    cursor = conn.cursor()
-    cursor.execute("""SELECT 
-    id,
-    nome,
-    strftime('%d/%m/%Y', data_nascimento) AS data_nascimento_formatada,
-    telefone,
-    email,
-    endereco,
-    bairro,
-    cidade,
-    uf,
-    cep,
-    naturalidade,
-    sexo,
-    estado_civil,
-    profissao,
-    altura,
-    peso,
-    indicado_por,
-    CASE
-		when onicomicose = 1 then 'SIM' 
-		else 'NÃO'
-	end as onicomicose ,
-CASE
-    WHEN onicocriptose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS onicocriptose,
+    nome = request.args.get('nome')
+    id = request.args.get('id')
+    if nome == 'None':
+        nome = None
+    if id == 'None':
+        id = None
+    pagina = request.args.get('pagina', 1, type=int)  # pega o parâmetro pagina (padrão 1)
+    por_pagina = 40  # quantos registros por página (ajuste o número que quiser)
 
-CASE
-    WHEN onicogrifose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS onicogrifose,
+    filtros = []
+    params = []
 
-CASE
-    WHEN onicoatrofia = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS onicoatrofia,
+    if nome:
+        filtros.append("nome like ?")
+        params.append(f"%{nome}%")
+    if id:
+        filtros.append("id = ?")
+        params.append(id)
 
-CASE
-    WHEN verruga_plantar = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS verruga_plantar,
+    where = ""
+    if filtros:
+        where = " WHERE " + " AND ".join(filtros)
 
-CASE
-    WHEN hiperidrose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS hiperidrose,
+    # Primeiro, conta o total de pacientes para paginação
+    query_count = "SELECT COUNT(*) FROM pacientes" + where
+    with sqlite3.connect(db) as conn:
+        cursor = conn.cursor()
+        cursor.execute(query_count, params)
+        total = cursor.fetchone()[0]
 
-CASE
-    WHEN anidrose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS anidrose,
+    # Calcula offset
+    offset = (pagina - 1) * por_pagina
 
-CASE
-    WHEN bromidrose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS bromidrose,
+    query = f"""
+    SELECT 
+        id,
+        nome,
+        strftime('%d/%m/%Y', data_nascimento) AS data_nascimento_formatada,
+        telefone,
+        email,
+        endereco,
+        bairro,
+        cidade,
+        uf,
+        cep,
+        naturalidade,
+        sexo,
+        estado_civil,
+        profissao,
+        altura,
+        peso,
+        indicado_por,
+        CASE WHEN onicomicose = 1 THEN 'SIM' ELSE 'NÃO' END AS onicomicose,
+        CASE WHEN onicocriptose = 1 THEN 'SIM' ELSE 'NÃO' END AS onicocriptose,
+        CASE WHEN onicogrifose = 1 THEN 'SIM' ELSE 'NÃO' END AS onicogrifose,
+        CASE WHEN onicoatrofia = 1 THEN 'SIM' ELSE 'NÃO' END AS onicoatrofia,
+        CASE WHEN verruga_plantar = 1 THEN 'SIM' ELSE 'NÃO' END AS verruga_plantar,
+        CASE WHEN hiperidrose = 1 THEN 'SIM' ELSE 'NÃO' END AS hiperidrose,
+        CASE WHEN anidrose = 1 THEN 'SIM' ELSE 'NÃO' END AS anidrose,
+        CASE WHEN bromidrose = 1 THEN 'SIM' ELSE 'NÃO' END AS bromidrose,
+        CASE WHEN cromidrose = 1 THEN 'SIM' ELSE 'NÃO' END AS cromidrose,
+        halux,
+        tipo_pe,
+        tipo_unha,
+        anamnese,
+        responsavel_cadastro
+    FROM pacientes
+    {where}
+    LIMIT ? OFFSET ?
+    """
 
-CASE
-    WHEN cromidrose = 1 THEN 'SIM'
-    ELSE 'NÃO'
-END AS cromidrose,
-	halux,
-    tipo_pe,
-    tipo_unha,
-    anamnese
-FROM 
-    pacientes;""")
-    pacientes = cursor.fetchall()
-    conn.close()
-    return render_template('pacientes.html', pacientes=pacientes)
+    with sqlite3.connect(db) as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, params + [por_pagina, offset])
+        pacientes = cursor.fetchall()
+
+    total_paginas = (total + por_pagina - 1) // por_pagina  # arredonda pra cima
+
+    return render_template(
+        'pacientes.html',
+        pacientes=pacientes,
+        pagina=pagina,
+        total_paginas=total_paginas,
+        nome=nome,
+        id=id
+    )
+
+
 # Adicionar paciente
 @app.route('/paciente/novo', methods=['GET', 'POST'])
 def novo_paciente():
@@ -134,6 +151,7 @@ def novo_paciente():
         anidrose = request.form['Anidrose'] if 'Anidrose' in request.form else '0'
         bromidrose = request.form['Bromidrose'] if 'Bromidrose' in request.form else '0'
         cromidrose = request.form['Cromidose'] if 'Cromidose' in request.form else '0'
+
         # Hálux (radio)
         halux = request.form['halux']
 
@@ -145,6 +163,8 @@ def novo_paciente():
 
         # Observações da anamnese
         anamnese = request.form['anamnese']
+        #responsavel
+        resp = request.form['responsavel_cadastro']
 
         conn = sqlite3.connect(db)
         cursor = conn.cursor()
@@ -152,12 +172,12 @@ def novo_paciente():
             INSERT INTO pacientes (nome, telefone,data_nascimento, email, endereco,bairro,cidade,uf,cep,naturalidade,sexo,estado_civil,
                                     profissao,altura,peso,indicado_por,onicomicose,onicocriptose,onicogrifose,onicoatrofia,
                                     verruga_plantar,hiperidrose,anidrose,bromidrose,cromidrose,halux,tipo_pe,tipo_unha,
-                                    anamnese)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                    anamnese,responsavel_cadastro)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)""",
             (nome, telefone, data_nascimento, email, endereco, bairro, cidade, estado, cep,
                 cidade_naturalidade, sexo, estado_civil, profissao, altura, peso, indicacao,
                 onicomicose, onicocriptose, onicogrifose, onicoatrofia, verruga_plantar,
-                hiperidrose, anidrose, bromidrose, cromidrose, halux, tipo_pe, tipo_unha, anamnese))
+                hiperidrose, anidrose, bromidrose, cromidrose, halux, tipo_pe, tipo_unha, anamnese,resp))
 
         conn.commit()
         conn.close()
@@ -181,13 +201,127 @@ def get_datas_da_semana(ano, semana_iso):
     ultimo_dia = primeiro_dia + timedelta(days=6)
     return primeiro_dia, ultimo_dia
 
+#LISTA PAGAMENTOS:
+
+@app.route("/pagamentos")
+def listar_pagamentos():
+    nome = request.args.get("nome")
+    id = request.args.get("id")
+    if nome == 'None':
+        nome = None
+    if id == 'None':
+        id = None
+    pagina = int(request.args.get("pagina", 1))
+    por_pagina = 50  # quantidade de registros por página
+
+    filtros = []
+    params = []
+
+    # Filtros
+    if nome:
+        filtros.append("nome LIKE ?")
+        params.append(f"%{nome}%")
+    if id:
+        filtros.append("id = ?")
+        params.append(id)
+
+    where_clause = "WHERE " + " AND ".join(filtros) if filtros else ""
+
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+
+    # KPIs
+    kpi_query = f"""
+                SELECT
+                    COUNT(*) AS total_registros,
+                    COALESCE(SUM(valor_numerico),0) AS soma_total_formatada,
+                    COALESCE(AVG(valor_numerico), 0)AS media_valores_formatada
+                FROM registros_pgto
+                {where_clause}
+    """
+    cursor.execute(kpi_query, params)
+    kpis = cursor.fetchone()
+
+    # Total de registros (para paginação)
+    total_registros = kpis[0]
+    total_paginas = math.ceil(total_registros / por_pagina)
+
+    # Paginação
+    offset = (pagina - 1) * por_pagina
+    query = f"""
+         SELECT 
+            a.id_pagamento, 
+            b.nome, 
+            strftime('%d/%m/%Y',a.data_pagamento) as data_pagamento, 
+            a.evolucao_conduta, 
+            a.valor_numerico
+        FROM registros_pgto a
+        LEFT JOIN pacientes b	
+            on a.id = b.id
+        {where_clause}
+        ORDER BY id_pagamento DESC
+        LIMIT ? OFFSET ?
+    """
+    cursor.execute(query, params + [por_pagina, offset])
+    pagamentos = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "pagamentos.html",
+        pagamentos=pagamentos,
+        total_registros=kpis[0],
+        soma_total=kpis[1],
+        media_valores=kpis[2],
+        pagina=pagina,
+        total_paginas=total_paginas,
+        nome=nome,
+        aluno_id=id
+    )
+
+
+@app.route('/pagamento/deletar/<int:id>')
+def deletar_pagamentos(id):
+    print(f"Tentando deletar pagamento com id: {id}")
+    print(f"id: {id}, tipo: {type(id)}")
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM registros_pgto WHERE id_pagamento = ?", (id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('listar_pagamentos'))
+
+@app.route('/pagamento/novo', methods=['GET', 'POST'])
+def novo_pagamento():
+    if request.method == 'POST':
+        paciente_id = request.form['paciente_id']
+        data_pagamento = request.form['data_pagamento']
+        conduta = request.form['conduta']
+        valor = request.form['valor']
+        responsavel = request.form['responsavel_pgto']
+
+        conn = sqlite3.connect(db)
+        cursor = conn.cursor()
+        cursor.execute("""
+                INSERT INTO registros_pgto(id,data_pagamento,evolucao_conduta,valor_numerico, responsavel_pelo_cadastro)
+                values(?,?,?,?,?)""",(paciente_id,data_pagamento,conduta,valor,responsavel))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('listar_pagamentos'))
+    # para preencher o select
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nome FROM pacientes")
+    pacientes = cursor.fetchall()
+
+    conn.close()
+    return render_template('novo_pagamento_form.html', pacientes=pacientes)
 #lista agenda
 @app.route('/agenda')
 def listar_agenda():
         data = request.args.get('data')
         mes = request.args.get('mes')
         semana = request.args.get('semana')
-
 
         conn = sqlite3.connect(db)
         cursor = conn.cursor()
@@ -198,7 +332,8 @@ def listar_agenda():
                 strftime('%d/%m/%Y', a.data) as data_formatada,
                 a.horario,
                 p.nome,
-                a.observacoes
+                a.observacoes,
+                a.responsavel_cadastro
             FROM 
                 agenda a
             JOIN 
@@ -248,13 +383,14 @@ def novo_agenda():
         data = request.form['data']
         horario = request.form['horario']
         observacoes = request.form['observacoes']
+        resp = request.form['responsavel']
 
         conn = sqlite3.connect(db)
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO agenda (paciente_id, data, horario, observacoes)
-            VALUES (?, ?, ?, ?)
-        """, (paciente_id, data, horario, observacoes))
+            INSERT INTO agenda (paciente_id, data, horario, observacoes,responsavel_cadastro)
+            VALUES (?, ?, ?, ?,?)
+        """, (paciente_id, data, horario, observacoes,resp))
 
         conn.commit()
         conn.close()
@@ -265,8 +401,8 @@ def novo_agenda():
     cursor = conn.cursor()
     cursor.execute("SELECT id, nome FROM pacientes")
     pacientes = cursor.fetchall()
-
     conn.close()
+
     return render_template('agenda_form.html', pacientes=pacientes)
 
 @app.route('/agenda/deletar/<int:id>')
@@ -286,30 +422,32 @@ def aniversariantes():
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT 
-                id,
-                nome,
-                strftime('%d/%m/%Y', data_nascimento) AS data_nascimento_formatada,
-                telefone
-            FROM 
-                pacientes
-            WHERE 
+                  SELECT 
+                    id,
+                    nome,
+                    strftime('%d/%m/%Y', data_nascimento) AS data_nascimento_formatada,
+                    telefone
+                FROM pacientes
+                WHERE
                 (
-                    (CAST (strftime('%m%d', data_nascimento) AS INTEGER) >= CAST (strftime('%m%d', 'now') AS INTEGER))
-                    AND
-                    (CAST (strftime('%m%d', data_nascimento) AS INTEGER) <= CAST (strftime('%m%d', date('now', '+14 days')) AS INTEGER))
-                )
-                OR
-                (
-                    (strftime('%m%d', 'now') > strftime('%m%d', date('now', '+14 days')))
-                    AND
                     (
-                        CAST (strftime('%m%d', data_nascimento) AS INTEGER) >= CAST (strftime('%m%d', 'now') AS INTEGER)
-                        OR
-                        CAST (strftime('%m%d', data_nascimento) AS INTEGER) <= CAST (strftime('%m%d', date('now', '+14 days')) AS INTEGER)
+                        CAST(strftime('%m%d', data_nascimento) AS INTEGER) >= CAST(strftime('%m%d', 'now') AS INTEGER)
+                        AND
+                        CAST(strftime('%m%d', data_nascimento) AS INTEGER) <= CAST(strftime('%m%d', date('now', '+14 days')) AS INTEGER)
+                    )
+                    OR
+                    (
+                        strftime('%m%d', 'now') > strftime('%m%d', date('now', '+14 days'))
+                        AND
+                        (
+                            CAST(strftime('%m%d', data_nascimento) AS INTEGER) >= CAST(strftime('%m%d', 'now') AS INTEGER)
+                            OR
+                            CAST(strftime('%m%d', data_nascimento) AS INTEGER) <= CAST(strftime('%m%d', date('now', '+14 days')) AS INTEGER)
+                        )
                     )
                 )
-            ORDER BY strftime('%m%d', data_nascimento);
+                AND telefone IS NOT NULL
+                ORDER BY strftime('%m%d', data_nascimento);
         """)
 
         pacientes = cursor.fetchall()
